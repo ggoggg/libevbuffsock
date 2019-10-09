@@ -10,6 +10,7 @@ static void buffered_socket_read_cb(EV_P_ struct ev_io *w, int revents);
 static void buffered_socket_write_cb(EV_P_ struct ev_io *w, int revents);
 static void buffered_socket_connect_cb(int revents, void *arg);
 static void buffered_socket_read_bytes_cb(EV_P_ struct ev_timer *w, int revents);
+static void buffered_socket_enable_write_cb(EV_P_ ev_async *w, int revents);
 
 struct BufferedSocket *new_buffered_socket(struct ev_loop *loop, const char *address, int port,
         size_t read_buf_len, size_t read_buf_capacity, size_t write_buf_len, size_t write_buf_capacity,
@@ -161,6 +162,11 @@ static void buffered_socket_connect_cb(int revents, void *arg)
     // kick off the read events
     ev_io_start(buffsock->loop, &buffsock->read_ev);
 
+    // start async watcher to independently start write events, not just as response to read event
+    buffsock->async_w.data = &buffsock->write_ev;;
+    ev_async_init(&buffsock->async_w, buffered_socket_enable_write_cb);
+    ev_async_start(buffsock->loop, &buffsock->async_w);
+
     if (buffsock->connect_callback) {
         (*buffsock->connect_callback)(buffsock, buffsock->cbarg);
     }
@@ -201,7 +207,8 @@ size_t buffered_socket_write(struct BufferedSocket *buffsock, void *data, size_t
     _DEBUG("%s: writing %lu bytes starting at %p\n", __FUNCTION__, len, data);
 
     buffer_add(buffsock->write_buf, data, len);
-    ev_io_start(buffsock->loop, &buffsock->write_ev);
+    ev_async_send(buffsock->loop, &buffsock->async_w);
+    // ev_io_start(buffsock->loop, &buffsock->write_ev);
 
     return len;
 }
@@ -316,4 +323,10 @@ error:
         (*buffsock->error_callback)(buffsock, buffsock->cbarg);
     }
     buffered_socket_close(buffsock);
+}
+
+static void buffered_socket_enable_write_cb(EV_P_ ev_async *w, int revents){
+    struct ev_io *write_ev = (struct ev_io *)w->data;
+    _DEBUG("%s: async enable write\n", __FUNCTION__);
+    ev_io_start(loop, write_ev);
 }

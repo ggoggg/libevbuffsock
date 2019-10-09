@@ -51,6 +51,7 @@ struct BufferedSocket {
     int state;
     struct ev_io read_ev;
     struct ev_io write_ev;
+    struct ev_async async_w;
     struct Buffer *read_buf;
     struct Buffer *write_buf;
     struct ev_timer read_bytes_timer_ev;

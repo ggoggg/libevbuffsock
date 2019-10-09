@@ -3,7 +3,7 @@ DESTDIR=
 LIBDIR=${PREFIX}/lib
 INCDIR=${PREFIX}/include
 
-CFLAGS+=-g -Wall -O2 -DDEBUG -fPIC
+CFLAGS+=-g -rdynamic -Wall -O2 -DDEBUG -fPIC -fno-omit-frame-pointer
 LIBS=-lev
 AR=ar
 AR_FLAGS=rc
@@ -21,7 +21,7 @@ libevbuffsock.a: buffered_socket.o buffer.o
 	$(RANLIB) $@
 
 test: test.o libevbuffsock.a
-	$(CC) -o $@ $^ $(LIBS)
+	$(CC) -o $@ $^ $(LIBS) -pthread
 
 clean:
 	rm -rf libbuffsock.a test *.o
