@@ -189,6 +189,7 @@ void buffered_socket_close(struct BufferedSocket *buffsock)
     if (buffsock->state != BS_CONNECTING) {
         ev_io_stop(buffsock->loop, &buffsock->read_ev);
         ev_io_stop(buffsock->loop, &buffsock->write_ev);
+        ev_async_stop(buffsock->loop, &buffsock->async_w);
     }
     buffsock->state = BS_DISCONNECTED;
     ev_timer_stop(buffsock->loop, &buffsock->read_bytes_timer_ev);
@@ -219,7 +220,7 @@ size_t buffered_socket_write_buffer(struct BufferedSocket *buffsock, struct Buff
 
     n = BUFFER_HAS_DATA(buf);
     if (n > 0) {
-        buffered_socket_write(buffsock, buf->data, n);
+        n = buffered_socket_write(buffsock, buf->data, n);
         buffer_reset(buf);
     }
 
