@@ -266,11 +266,14 @@ static void buffered_socket_read_cb(EV_P_ struct ev_io *w, int revents)
     _DEBUG("%s: %d bytes read\n", __FUNCTION__, res);
 
     if (res == -1) {
-        if (errno == EAGAIN || errno == EINTR) {
+        if (errno == EAGAIN || errno == EINTR || errno == EINPROGRESS || errno == EALREADY) {
             return;
         }
         goto error;
     } else if (res == 0) {
+        if(errno == EINPROGRESS || errno == EALREADY){
+            return;
+        }
         goto error;
     }
 
@@ -305,11 +308,14 @@ static void buffered_socket_write_cb(EV_P_ struct ev_io *w, int revents)
     }
 
     if (res == -1) {
-        if (errno == EAGAIN || errno == EINTR || errno == EINPROGRESS) {
+        if (errno == EAGAIN || errno == EINTR || errno == EINPROGRESS || errno == EALREADY) {
             return;
         }
         goto error;
     } else if (res == 0) {
+        if(errno == EINPROGRESS || errno == EALREADY){
+            return;
+        }
         goto error;
     }
 

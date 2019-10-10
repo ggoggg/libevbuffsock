@@ -123,7 +123,7 @@ int buffer_read_fd(struct Buffer *buf, int fd)
 int buffer_write_fd(struct Buffer *buf, int fd)
 {
     int n;
-    n = send(fd, buf->data, buf->offset, 0);
+    n = send(fd, buf->data, buf->offset, MSG_NOSIGNAL);
     if (n > 0) {
         buffer_drain(buf, n);
     }
