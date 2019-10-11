@@ -63,6 +63,7 @@ struct BufferedSocket {
     void (*close_callback)(struct BufferedSocket *buffsock, void *arg);
     void (*read_callback)(struct BufferedSocket *buffsock, struct Buffer *buf, void *arg);
     void (*write_callback)(struct BufferedSocket *buffsock, void *arg);
+    void (*async_write_callback)(struct BufferedSocket *buffsock, void *arg);
     void (*error_callback)(struct BufferedSocket *buffsock, void *arg);
     void *cbarg;
 };
@@ -73,12 +74,14 @@ struct BufferedSocket *new_buffered_socket(struct ev_loop *loop, const char *add
         void (*close_callback)(struct BufferedSocket *buffsock, void *arg),
         void (*read_callback)(struct BufferedSocket *buffsock, struct Buffer *buf, void *arg),
         void (*write_callback)(struct BufferedSocket *buffsock, void *arg),
+        void (*async_write_callback)(struct BufferedSocket *buffsock, void *arg),
         void (*error_callback)(struct BufferedSocket *buffsock, void *arg),
         void *cbarg);
 void free_buffered_socket(struct BufferedSocket *socket);
 int buffered_socket_connect(struct BufferedSocket *buffsock);
 void buffered_socket_close(struct BufferedSocket *socket);
 size_t buffered_socket_write(struct BufferedSocket *buffsock, void *data, size_t len);
+size_t buffered_socket_async_write(struct BufferedSocket *bs);
 size_t buffered_socket_write_buffer(struct BufferedSocket *buffsock, struct Buffer *buf);
 void buffered_socket_read_bytes(struct BufferedSocket *buffsock, size_t n, 
     void (*data_callback)(struct BufferedSocket *buffsock, void *arg), void *arg);
