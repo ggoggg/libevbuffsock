@@ -24,7 +24,6 @@ struct BufferedSocket *new_buffered_socket(struct ev_loop *loop, const char *add
 {
     struct BufferedSocket *buffsock;
 
-    printf("async %p\n", async_write_callback);
     buffsock = calloc(1, (sizeof(struct BufferedSocket)));
     buffsock->address = strdup(address);
     buffsock->port = port;
@@ -282,9 +281,6 @@ static void buffered_socket_read_cb(EV_P_ struct ev_io *w, int revents)
         }
         goto error;
     } else if (res == 0) {
-        if(errno == EINPROGRESS || errno == EALREADY){
-            return;
-        }
         goto error;
     }
 
@@ -324,9 +320,6 @@ static void buffered_socket_write_cb(EV_P_ struct ev_io *w, int revents)
         }
         goto error;
     } else if (res == 0) {
-        if(errno == EINPROGRESS || errno == EALREADY){
-            return;
-        }
         goto error;
     }
 

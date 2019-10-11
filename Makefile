@@ -3,8 +3,8 @@ DESTDIR=
 LIBDIR=${PREFIX}/lib
 INCDIR=${PREFIX}/include
 
-CFLAGS+=-g -rdynamic -Wall -O2 -DDEBUG -fPIC -fno-omit-frame-pointer
-# CFLAGS+=-g -rdynamic -Wall -O2 -fPIC -fno-omit-frame-pointer
+# CFLAGS+=-g -rdynamic -Wall -O2 -DDEBUG -fPIC -fno-omit-frame-pointer
+CFLAGS+=-g -rdynamic -Wall -O2 -fPIC -fno-omit-frame-pointer
 LIBS=-lev
 AR=ar
 AR_FLAGS=rc
