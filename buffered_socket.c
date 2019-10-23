@@ -273,7 +273,7 @@ static void buffered_socket_read_cb(EV_P_ struct ev_io *w, int revents)
     int res;
 
     res = buffer_read_fd(buffsock->read_buf, w->fd);
-    _DEBUG("%s: %d bytes read\n", __FUNCTION__, res);
+    _DEBUG("%s: %d bytes read. errno %d\n", __FUNCTION__, res, errno);
 
     if (res == -1) {
         if (errno == EAGAIN || errno == EINTR || errno == EINPROGRESS || errno == EALREADY) {
