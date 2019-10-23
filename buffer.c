@@ -109,10 +109,12 @@ int buffer_read_fd(struct Buffer *buf, int fd)
     
     need = n - BUFFER_AVAILABLE(buf);
     if (need > 0 && !buffer_expand(buf, need)) {
-        return -1;
+        _DEBUG("%s: %d bytes needed failed to expand. errno %d\n", __FUNCTION__, need, errno);
+        return -2;
     }
     
     n = recv(fd, buf->data + buf->offset, n, 0);
+    _DEBUG("%s: %d bytes recvd. errno %d\n", __FUNCTION__, n, errno);
     if (n > 0) {
         buf->offset += n;
     }
